@@ -1,18 +1,29 @@
-# This is a comment line
-CC=g++
-# CFLAGS will be the options passed to the compiler.
-CFLAGS= -c -Wall
+# Compiler
+CXX := g++
 
-all: tetris
+# Compiler flags
+CXXFLAGS := -Wall -Wextra
 
-tetris: main.o piece.o
-	$(CC) main.o piece.o -o tetris
+# Source files
+SRC := $(wildcard *.cpp)
 
-main.o: main.cpp
-	$(CC) $(CFLAGS) main.cpp
+# Object files
+OBJ := $(SRC:.cpp=.o)
 
-piece.o: piece.cpp
-	$(CC) $(CFLAGS) piece.cpp
+# Target executable
+TARGET := tetris
 
+# Default rule to build the target
+all: $(TARGET)
+
+# Rule to build the target from object files
+$(TARGET): $(OBJ)
+	$(CXX) $(CXXFLAGS) $^ -o $@
+
+# Rule to generate object files from source files
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+# Rule to clean the project
 clean:
-	rm -rf *.o 
+	rm -f $(OBJ) $(TARGET)
