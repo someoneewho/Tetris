@@ -1,11 +1,12 @@
 #include <iostream>
-#include "piece.h"
+#include "board.h"
+#include "game.h"
 using namespace std;
 
 int main()
 {
-    Piece p;
-    
+    Board board(10, 20);
+    Game game;
     cout << "Hello\n";
     return 0;
 }
