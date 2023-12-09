@@ -35,7 +35,30 @@ Piece::Piece(PieceType pt){
 }
 
 void Piece::Rotate(){
+    char **temp = new char*[_numColumns];
 
+    for(int i = 0 ; i < _numColumns; i++){
+        temp[i] = new char[_numRows];
+    }
+
+    for(int i = 0; i < _numRows; i++){
+        for(int j = 0; j < _numColumns; j++){
+            temp[j][_numRows - i - 1] = _shape[i][j];
+        }
+    }
+
+    for(int i = 0; i < _numRows; i++){
+        for(int j = 0; j < _numColumns; j++){
+            _shape[i][j] = temp[i][j] ;
+        }
+    }
+
+    for (int i = 0; i < _numColumns; i++) {
+        delete[] temp[i];
+    }
+    delete[] temp;
+
+    std::swap(_numRows, _numColumns);
 }
 
 void Piece::print(){

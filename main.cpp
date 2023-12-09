@@ -10,7 +10,7 @@ int main()
     srand(time(NULL));
     Board board(10, 20);
     Game game;
-    Piece p(3, 2);
+    Piece p(3, 3);
     p.print();
     p.Rotate();
     p.print();
