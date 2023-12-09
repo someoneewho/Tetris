@@ -4,7 +4,7 @@
 
 class Game {
 private:
-    Piece currentPiece;
+
     
 };
 
