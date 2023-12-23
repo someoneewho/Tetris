@@ -2,7 +2,15 @@
 
 class Piece {
 public: 
-    enum PieceType {
+
+    struct ShapeMatrix {
+        int rows;
+        int cols;
+        int data[3][3];
+    };
+
+
+    enum PieceType : int {
         PLUS_SIGN,
         SMALL_SQUARE,
         CORNER_PIECE,
@@ -16,16 +24,31 @@ public:
         END
     };
 
+
     Piece(int numRows, int numColumns);
     Piece(PieceType pt);
     ~Piece();
-    void Rotate();
+
+    bool RotateCW();
+    bool RotateCCW();
     void print();
-    
+
+    int getNumRows() {
+        return _numRows;
+    }
+
+    int getNumColumns() {
+        return _numColumns;
+    }
+
+    const int** getMatrix() {
+        return const_cast<const int**>(_matrix);
+    }   
 
 private:
     int _numRows = 0;
     int _numColumns = 0;
-    char **_shape = nullptr;
+    int **_matrix = nullptr;
+    int _cntRotate = 0;
 
 };
