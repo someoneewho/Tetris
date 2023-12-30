@@ -1,13 +1,16 @@
 #pragma once
 
+class Board;
+
 class Piece {
 public: 
 
     struct ShapeMatrix {
-        int rows;
-        int cols;
-        int data[3][3];
+        int rows = 0;
+        int cols = 0;
+        int data[3][3] = {};
     };
+
 
 
     enum PieceType : int {
@@ -24,31 +27,31 @@ public:
         END
     };
 
+    enum RotateType{
+        ROTATE_CW,
+        ROTATE_CCW,
+    };
 
-    Piece(int numRows, int numColumns);
+    Piece(const ShapeMatrix &matrix);
     Piece(PieceType pt);
-    ~Piece();
 
-    bool RotateCW();
-    bool RotateCCW();
-    void print();
+    bool Rotate(RotateType rt);
+    ShapeMatrix getRotatedShape(RotateType rt);
 
     int getNumRows() {
-        return _numRows;
+        return _matrix.rows;
     }
 
     int getNumColumns() {
-        return _numColumns;
+        return _matrix.cols;
     }
 
-    const int** getMatrix() {
-        return const_cast<const int**>(_matrix);
+    const ShapeMatrix& getMatrix() {
+        return _matrix;
     }   
 
 private:
-    int _numRows = 0;
-    int _numColumns = 0;
-    int **_matrix = nullptr;
+    ShapeMatrix _matrix;
     int _cntRotate = 0;
 
 };

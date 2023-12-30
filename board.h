@@ -15,23 +15,14 @@ public:
         _currentPiecePosY = 0;
     }
 
-    bool IsValidMove(int newX, int newY);
-
-    void RotatePieceCW() {
-        if (_currentPiece){
-            _currentPiece->RotateCW();
-        }
-    }
-
-    void RotatePieceCCW() {
-        if (_currentPiece) {
-            _currentPiece->RotateCCW();
-        }
-    }
+    void RotatePieceCW();
+    void RotatePieceCCW();
 
     void MovePieceRight();
     void MovePieceLeft();
     void MovePieceDown();
+    bool IsValidMove(int newX, int newY);
+    bool IsRotationValid(Piece::RotateType rt);
 
 
 private:
