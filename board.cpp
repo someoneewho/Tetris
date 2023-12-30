@@ -49,6 +49,20 @@ void Board::MovePieceLeft() {
     }
 }
 
+void Board::ClearRow(int rowIndex) {
+    // Shift rows above the cleared row down
+    int *tempRow = _grid[rowIndex];
+    for (int i = rowIndex; i > 0; --i) {
+        _grid[i] = _grid[i - 1];
+    }
+
+    //clear the top tow
+    _grid[0] = tempRow;
+    for (int j = 0; j < _width; ++j) {
+        _grid[0][j] = 0;
+    }
+}
+
 void Board::MovePieceDown() {
     if (_currentPiece == nullptr) { 
         return;
@@ -72,8 +86,34 @@ void Board::MovePieceDown() {
             }
         }
 
+        int fullRowIndex = getFullRow();
+        
+        while (fullRowIndex != -1) {
+            ClearRow(fullRowIndex);
+            fullRowIndex = getFullRow();
+        }
+        
         _currentPiece = nullptr;
     }
+}
+
+int Board::getFullRow(){
+
+    for(int i = _height - 1 ; i > 0; i--){
+        bool rowFull = true;
+        for(int j = 0; j < _width; j++){
+            if(_grid[i][j] == 0){
+                rowFull = false;
+                break;
+            }
+        }
+
+        if(rowFull == true){
+            return i;
+        }
+    }
+
+    return -1;
 }
 
 bool Board::IsValidMove(int newX, int newY){

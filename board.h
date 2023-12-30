@@ -24,6 +24,10 @@ public:
     bool IsValidMove(int newX, int newY);
     bool IsRotationValid(Piece::RotateType rt);
 
+    int getFullRow();
+    void ClearRow(int rowIndex);
+
+
 
 private:
     int _width;
