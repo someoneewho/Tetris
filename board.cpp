@@ -8,15 +8,40 @@ Board::Board(int width, int height) : _width(width), _height(height) {
         _grid[i] = new int[_width]{};
     }
 
-    // for (int i = 0; i < _height; i++){
-    //     _grid[i][2] = _grid[i][7] = 1;
-    // }
-
     _cellShape.setSize(sf::Vector2f(30.f, 30.f));
     _cellShape.setOutlineThickness(1.f);
     _cellShape.setOutlineColor(sf::Color::White);
 }
 
+/**
+ * @brief Sets the current piece on the board.
+ *
+ * This function places the given Tetris piece on the board at its initial position.
+ * It checks if the destination cells on the board are empty; if not, the function returns false,
+ * indicating that the game should end.
+ *
+ * @param currentPiece Pointer to the Tetris piece to be placed on the board.
+ * @return True if the piece is successfully placed on the board, false otherwise.
+ */
+bool Board::SetCurrentPiece(Piece *currentPiece){
+    //initial position
+    _currentPiecePosX = (_width - currentPiece->getNumColumns()) / 2;
+    _currentPiecePosY = 0;
+
+    _currentPiece = currentPiece;
+
+    for(int row = 0; row < _currentPiece->getNumRows(); row++){
+        for(int col = 0; col < _currentPiece->getNumColumns(); col++){
+            // Check if the current cell on the board is not empty.
+            if(_grid[_currentPiecePosY + row][_currentPiecePosX + col] != 0){
+                // There is a filled cell, indicating a collision, so return false.
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
 Board::~Board() {
     // Free the allocated memory for the 2D array
     for (int i = 0; i < _height; ++i) {
@@ -63,38 +88,52 @@ void Board::ClearRow(int rowIndex) {
     }
 }
 
-void Board::MovePieceDown() {
+/**
+ * @brief Moves the current piece down and handles locking and row clearing.
+ *
+ * Moves the current piece down on the game board. If the move is not valid, the piece is locked
+ * in place, and any full rows are cleared.
+ *
+ * @return A pair indicating whether the piece is locked and the number of cleared full rows.
+ *         If no piece is present, an empty pair is returned.
+ */
+std::pair<bool, int> Board::MovePieceDown() {
     if (_currentPiece == nullptr) { 
-        return;
+        return {};
     }
  
     int newY = _currentPiecePosY + 1;
     
     if (IsValidMove(_currentPiecePosX, newY)) {
         _currentPiecePosY = newY;
+        return {};
     }
-    else {
+    
+    LockCurrentPiece();
 
-        int pieceRows = _currentPiece->getNumRows();
-        int pieceCols = _currentPiece->getNumColumns();
+    int fullRowIndex = getFullRow();
 
-        for (int i = 0; i < pieceRows; i++) {
-            for (int j = 0; j < pieceCols; j++) {
-                if (_currentPiece->getMatrix().data[i][j] != 0) {
-                    _grid[_currentPiecePosY + i][_currentPiecePosX + j] = 1;
-                }
+    while (fullRowIndex != -1){
+        ClearRow(fullRowIndex);
+        fullRowIndex = getFullRow();
+    }
+
+    return {true, fullRowIndex};
+}
+
+void Board::LockCurrentPiece(){
+    int pieceRows = _currentPiece->getNumRows();
+    int pieceCols = _currentPiece->getNumColumns();
+
+    for(int i = 0; i < pieceRows; i++){
+        for(int j = 0; j < pieceCols; j++){
+            if(_currentPiece->getMatrix().data[i][j] != 0){
+                _grid[_currentPiecePosY + i][_currentPiecePosX + j] = 1;
             }
         }
-
-        int fullRowIndex = getFullRow();
-        
-        while (fullRowIndex != -1) {
-            ClearRow(fullRowIndex);
-            fullRowIndex = getFullRow();
-        }
-        
-        _currentPiece = nullptr;
     }
+
+    _currentPiece = nullptr;
 }
 
 int Board::getFullRow(){

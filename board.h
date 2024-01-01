@@ -2,6 +2,7 @@
 #include "piece.h"
 #include <SFML/Graphics.hpp>
 
+constexpr int CELL_SIZE = 30;
 class Board {
 public:
     Board(int width, int height);
@@ -9,24 +10,24 @@ public:
 
     // Draw the game board on the specified SFML window
     void draw(sf::RenderWindow& window);
-    void setCurrentPiece(Piece *currentPiece) {
-        _currentPiece = currentPiece;
-        _currentPiecePosX = (_width - currentPiece->getNumColumns()) / 2;
-        _currentPiecePosY = 0;
-    }
+    bool SetCurrentPiece(Piece *currentPiece);
 
     void RotatePieceCW();
     void RotatePieceCCW();
 
     void MovePieceRight();
     void MovePieceLeft();
-    void MovePieceDown();
+    std::pair<bool, int> MovePieceDown();
     bool IsValidMove(int newX, int newY);
     bool IsRotationValid(Piece::RotateType rt);
 
     int getFullRow();
     void ClearRow(int rowIndex);
+    int getWidth() { return _width; }
+    int getHeight() { return _height; }
 
+private:
+    void LockCurrentPiece();
 
 
 private:

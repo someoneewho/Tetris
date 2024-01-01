@@ -18,6 +18,11 @@ Piece::ShapeMatrix shapeMatrices[] = {
     {2, 3, {{0, 1, 0}, {1, 1, 1}}}                  // Pyramid
 };
 
+Piece::PieceType Piece::getRandomPieceType()
+{
+    return (Piece::PieceType)(rand() % Piece::END);
+}
+
 Piece::Piece(const ShapeMatrix &matrix) : _matrix(matrix)
 {
 

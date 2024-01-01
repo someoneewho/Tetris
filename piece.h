@@ -11,8 +11,6 @@ public:
         int data[3][3] = {};
     };
 
-
-
     enum PieceType : int {
         PLUS_SIGN,
         SMALL_SQUARE,
@@ -49,6 +47,8 @@ public:
     const ShapeMatrix& getMatrix() {
         return _matrix;
     }   
+
+    static PieceType getRandomPieceType();
 
 private:
     ShapeMatrix _matrix;
