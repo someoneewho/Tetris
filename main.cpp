@@ -6,32 +6,58 @@
 
 using namespace std;
 
+int getBoundedInput(const string& prompt, int minValue, int maxValue) {
+    int value;
+    while (true) {
+        cout << prompt;
+        if (cin >> value) {
+            // Input was an integer
+            if (value >= minValue && value <= maxValue) {
+                // Valid input, break the loop
+                break;
+            } else {
+                cout << "Value must be between " << minValue << " and " << maxValue << ". Try again." << endl;
+            }
+        } else {
+            // Input was not an integer
+            cout << "Invalid input. Please enter an integer." << endl;
+            cin.clear(); // Clear the error flag
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Discard invalid input
+        }
+    }
+
+    return value;
+}
 
 int main() {
-    srand(std::time(nullptr));
+    srand(time(nullptr));
 
 
     unsigned boardWidth, boardHeight, level, speed;
-    std::string userName;
+    string userName;
 
-    std::cout << "Enter Board Width: ";
-    std::cin >> boardWidth;
+    boardWidth = getBoundedInput("Enter Board Width (min 5, max 50): ", 5, 50);
+    boardHeight = getBoundedInput("Enter Board Height (min 10, max 100): ", 10, 100);
+    level = getBoundedInput("Select Level (1-10): ", 1, 10);
+    speed = getBoundedInput("Select Speed (1-10): ", 1, 10);
 
-    std::cout << "Enter Board Height: ";
-    std::cin >> boardHeight;
+    // cout << "Select Username: ";
+    // cin >> userName; 
 
-    // std::cout << "Select Level (1-10): ";
-    // std::cin >> level;
 
-    // std::cout << "Select Speed (1-10): ";
-    // std::cin >> speed;
+    int numCustomPiecesToAdd;
+    numCustomPiecesToAdd = getBoundedInput("How many custom pieces do you want to add? (0-3): ", 0, 3);
 
-    // std::cout << "Select Username: ";
-    // std::cin >> userName; 
+    for (int i = 0; i < numCustomPiecesToAdd; ++i) {
+        cout << "\nCustom Piece #" << i + 1 << ":\n";
+        Piece::addCustomPiece();
+    }
+
+    cout << "Tetris Game starting!" << endl;
 
     sf::RenderWindow window(sf::VideoMode(30 * boardWidth + 200, 30 * boardHeight), "Tetris");
 
-    Game tetrisGame(boardWidth, boardHeight, window);
+    Game tetrisGame(boardWidth, boardHeight, window, level, speed);
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {

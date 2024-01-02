@@ -18,8 +18,11 @@ private:
         _isPaused = !_isPaused;
     }
 
+    void reset();
     void updateDown();
     void drawNextPiece();
+    void displayGameInfo();
+    void updateScore(int clearedRows);
     bool isGameRunning() {
         return !(_isPaused || _isGameOver);
     }
@@ -31,6 +34,7 @@ private:
     std::string _userName;
     unsigned _level;
     unsigned _speed;
+    unsigned _score = 0;
 
     Piece _currentPiece;
     Piece _nextPiece;
@@ -38,6 +42,9 @@ private:
     bool _isPaused = false;
     bool _isGameOver = false;;
 
+    const unsigned _initialLevel;
+    const unsigned _initialSpeed;
+    
     sf::Clock _clock;
 };
 

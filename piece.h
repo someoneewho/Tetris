@@ -5,6 +5,8 @@ class Board;
 class Piece {
 public: 
 
+    Piece() = default; ////BU NE DEMEK???????
+
     struct ShapeMatrix {
         int rows = 0;
         int cols = 0;
@@ -48,10 +50,16 @@ public:
         return _matrix;
     }   
 
-    static PieceType getRandomPieceType();
+    unsigned getRotationsLeft();
+
+    static Piece getRandomPiece();
+    static void addCustomPiece();
 
 private:
     ShapeMatrix _matrix;
     int _cntRotate = 0;
+
+    static ShapeMatrix customPieces[3];
+    static int customPieceCount;
 
 };

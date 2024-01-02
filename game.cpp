@@ -1,13 +1,14 @@
 #include "game.h"
+#include <iostream>
+
+#define MAX_LEVEL 10
+#define MAX_SPEED 10
 
 Game::Game(unsigned boardWidth, unsigned boardHeight, sf::RenderWindow& window, unsigned level, unsigned speed, std::string userName) 
     : _window{window}, _tetrisBoard(boardWidth, boardHeight), _userName{userName}
-    , _currentPiece{Piece::getRandomPieceType()}, _nextPiece{Piece::getRandomPieceType()}
+    , _initialLevel{level}, _initialSpeed{speed}
 {
-    // check min-max boundries
-    _level = level;
-    _speed = speed;
-    _tetrisBoard.SetCurrentPiece(&_currentPiece);
+    reset();
 }
 
 void Game::HandleKeyPress(sf::Keyboard::Key keyCode) {
@@ -33,12 +34,16 @@ void Game::HandleKeyPress(sf::Keyboard::Key keyCode) {
                 _tetrisBoard.RotatePieceCCW();
             break;
         case sf::Keyboard::R:
-            // resetGame();
+            if(_isGameOver){
+                reset();
+            }
             break;
         case sf::Keyboard::P:
-            togglePause();
+            if(_isGameOver == false){
+                togglePause();
+            }
             break;
-        
+
         default:
             break;
     }
@@ -60,16 +65,53 @@ void Game::updateDown() {
 
     if (isLocked) {
         _currentPiece = _nextPiece;
-        _nextPiece = Piece(Piece::getRandomPieceType());
+        _nextPiece = Piece::getRandomPiece();
         
         bool status = _tetrisBoard.SetCurrentPiece(&_currentPiece);
 
         if (status == false) {
             _isGameOver = true;
         }
-
-        // score, level, and speed calculation
     }
+}
+
+void Game::updateScore(int clearedRows) {
+    // Increase score for each cleared row
+    _score += clearedRows * 100;
+
+    if(clearedRows > 1){
+        //Bonus points for combo. For ex, extra points for each additional cleared row
+        int comboBonus = (clearedRows - 1) * 50;
+        _score += comboBonus;
+    }
+
+    //Change core with level (and level up by 500 points)
+    int targetScoreForNextLevel = 500 * (_level +1);
+    if(_score >= targetScoreForNextLevel){
+        if(_level < MAX_LEVEL){
+            _level++;
+        }
+        //Change speed with score
+        if(_speed < MAX_SPEED){
+            _speed++;
+        }
+    }
+}
+
+void Game::reset(){
+    _score = 0;
+    _level = 0;
+    _speed = _initialSpeed;
+    _isPaused = false;
+    _isGameOver = false;
+
+    _tetrisBoard.Clear();
+
+    _currentPiece = Piece::getRandomPiece();
+    _nextPiece = Piece::getRandomPiece();
+    _tetrisBoard.SetCurrentPiece(&_currentPiece);
+
+    _clock.restart();
 }
 
 void Game::drawNextPiece() {
@@ -94,8 +136,80 @@ void Game::drawNextPiece() {
 }
 
 
+
+void Game::displayGameInfo() {
+    sf::Font font;
+    if (!font.loadFromFile("arial.ttf")) {
+        std::cerr << "Error loading font\n";
+        return;
+    }
+
+    sf::Text scoreText;
+    scoreText.setFont(font);
+    scoreText.setCharacterSize(20);
+    scoreText.setFillColor(sf::Color::Magenta);
+    scoreText.setPosition(_tetrisBoard.getWidth() * CELL_SIZE + CELL_SIZE, 5 * CELL_SIZE);
+    scoreText.setString("Score: " + std::to_string(_score));
+
+    sf::Text levelText;
+    levelText.setFont(font);
+    levelText.setCharacterSize(20);
+    levelText.setFillColor(sf::Color::Magenta);
+    levelText.setPosition(_tetrisBoard.getWidth() * CELL_SIZE + CELL_SIZE, 6 * CELL_SIZE);
+    levelText.setString("Level: " + std::to_string(_level));
+
+    sf::Text speedText;
+    speedText.setFont(font);
+    speedText.setCharacterSize(20);
+    speedText.setFillColor(sf::Color::Magenta);
+    speedText.setPosition(_tetrisBoard.getWidth() * CELL_SIZE + CELL_SIZE, 7 * CELL_SIZE);
+    speedText.setString("Speed: " + std::to_string(_speed));
+
+    sf::Text rotateCountLeftText;
+    rotateCountLeftText.setFont(font);
+    rotateCountLeftText.setCharacterSize(20);
+    rotateCountLeftText.setFillColor(sf::Color::Magenta);
+    rotateCountLeftText.setPosition(_tetrisBoard.getWidth() * CELL_SIZE + CELL_SIZE, 8 * CELL_SIZE);
+
+    unsigned rotateCountLeft = 0;
+        rotateCountLeft = _currentPiece.getRotationsLeft();
+
+    rotateCountLeftText.setString("Rotations Left: " + std::to_string(rotateCountLeft));
+
+
+    _window.draw(scoreText);
+    _window.draw(levelText);
+    _window.draw(speedText);
+    _window.draw(rotateCountLeftText);
+
+    if (_isPaused)
+    {
+        sf::Text pausedText;
+        pausedText.setFont(font);
+        pausedText.setCharacterSize(24);
+        pausedText.setFillColor(sf::Color::Red);
+        pausedText.setPosition(_tetrisBoard.getWidth() * CELL_SIZE + CELL_SIZE, 9 * CELL_SIZE);
+        pausedText.setString("PAUSED !");
+        _window.draw(pausedText);
+    }
+
+    if (_isGameOver)
+    {
+        sf::Text gameOverText;
+        gameOverText.setFont(font);
+        gameOverText.setCharacterSize(24);
+        gameOverText.setFillColor(sf::Color::Red);
+        gameOverText.setPosition(_tetrisBoard.getWidth() * CELL_SIZE + CELL_SIZE, 9 * CELL_SIZE);
+        gameOverText.setString("GAME OVER !");
+        _window.draw(gameOverText);
+    }
+    
+}
+
+
 void Game::Draw() {
     _window.clear();
     _tetrisBoard.draw(_window);
     drawNextPiece();
+    displayGameInfo();
 }

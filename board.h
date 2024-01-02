@@ -25,6 +25,7 @@ public:
     void ClearRow(int rowIndex);
     int getWidth() { return _width; }
     int getHeight() { return _height; }
+    void Clear();
 
 private:
     void LockCurrentPiece();
