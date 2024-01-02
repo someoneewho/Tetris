@@ -22,7 +22,7 @@ private:
     void updateDown();
     void drawNextPiece();
     void displayGameInfo();
-    void updateScore(int clearedRows);
+    void updateScore(unsigned clearedRows);
     bool isGameRunning() {
         return !(_isPaused || _isGameOver);
     }
@@ -44,7 +44,7 @@ private:
 
     const unsigned _initialLevel;
     const unsigned _initialSpeed;
-    
+
     sf::Clock _clock;
 };
 

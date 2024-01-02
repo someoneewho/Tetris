@@ -5,7 +5,7 @@ class Board;
 class Piece {
 public: 
 
-    Piece() = default; ////BU NE DEMEK???????
+    Piece() = default;
 
     struct ShapeMatrix {
         int rows = 0;
@@ -61,5 +61,4 @@ private:
 
     static ShapeMatrix customPieces[3];
     static int customPieceCount;
-
 };

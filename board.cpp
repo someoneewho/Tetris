@@ -88,14 +88,16 @@ void Board::ClearRow(int rowIndex) {
     }
 }
 
-void Board::Clear(){
-    for (unsigned row = 0; row < _height; ++row){
-        for(unsigned col = 0; col < _width; ++col){
-            _grid[row][col] = 0;
+void Board::Clear() {
+    for (unsigned row = 0; row < _height; ++row) {
+        for (unsigned col = 0; col < _width; ++col) {
+            _grid[row][col] = 0; 
         }
     }
+    
     _currentPiece = nullptr;
 }
+
 
 /**
  * @brief Moves the current piece down and handles locking and row clearing.
@@ -129,7 +131,7 @@ std::pair<bool, int> Board::MovePieceDown() {
         fullRowIndex = getFullRow();
     }
 
-    return {true, fullRowIndex};
+    return {true, clearedRows};
 }
 
 void Board::LockCurrentPiece(){

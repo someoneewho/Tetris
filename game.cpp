@@ -34,16 +34,16 @@ void Game::HandleKeyPress(sf::Keyboard::Key keyCode) {
                 _tetrisBoard.RotatePieceCCW();
             break;
         case sf::Keyboard::R:
-            if(_isGameOver){
+            if (_isGameOver) {
                 reset();
             }
             break;
         case sf::Keyboard::P:
-            if(_isGameOver == false){
+            if (_isGameOver == false) {
                 togglePause();
             }
             break;
-
+        
         default:
             break;
     }
@@ -53,7 +53,7 @@ void Game::Update() {
     if (isGameRunning() == false)
         return;
 
-    if (_clock.getElapsedTime().asSeconds() >= 1.0) {
+    if (_clock.getElapsedTime().asSeconds() >= 1 - 0.1 * (_speed - 1)) {
 
         updateDown();
         _clock.restart();
@@ -64,6 +64,7 @@ void Game::updateDown() {
     auto [isLocked, clearedRows] = _tetrisBoard.MovePieceDown();
 
     if (isLocked) {
+        updateScore(clearedRows);
         _currentPiece = _nextPiece;
         _nextPiece = Piece::getRandomPiece();
         
@@ -72,35 +73,38 @@ void Game::updateDown() {
         if (status == false) {
             _isGameOver = true;
         }
+        
     }
 }
 
-void Game::updateScore(int clearedRows) {
+
+void Game::updateScore(unsigned clearedRows) {
     // Increase score for each cleared row
     _score += clearedRows * 100;
 
-    if(clearedRows > 1){
-        //Bonus points for combo. For ex, extra points for each additional cleared row
+    // Check for combo points
+    if (clearedRows > 1) {
+        // Bonus points for combo (for example, extra points for each additional cleared row)
         int comboBonus = (clearedRows - 1) * 50;
         _score += comboBonus;
     }
 
-    //Change core with level (and level up by 500 points)
-    int targetScoreForNextLevel = 500 * (_level +1);
-    if(_score >= targetScoreForNextLevel){
-        if(_level < MAX_LEVEL){
+    // Change score with level (and level up by 500 points)
+    int targetScoreForNextLevel = 500 * (_level + 1);
+    if (_score >= targetScoreForNextLevel) {
+        if (_level < MAX_LEVEL) {
             _level++;
         }
         //Change speed with score
-        if(_speed < MAX_SPEED){
+        if (_speed < MAX_SPEED) {
             _speed++;
         }
     }
 }
 
-void Game::reset(){
+void Game::reset() {
     _score = 0;
-    _level = 0;
+    _level = _initialLevel;
     _speed = _initialSpeed;
     _isPaused = false;
     _isGameOver = false;
@@ -134,8 +138,6 @@ void Game::drawNextPiece() {
         }
     }
 }
-
-
 
 void Game::displayGameInfo() {
     sf::Font font;
@@ -205,6 +207,7 @@ void Game::displayGameInfo() {
     }
     
 }
+
 
 
 void Game::Draw() {
