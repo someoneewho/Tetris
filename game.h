@@ -5,6 +5,7 @@
 #include "board.h"
 
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 
 class Game {
 public:
@@ -12,12 +13,14 @@ public:
     void HandleKeyPress(sf::Keyboard::Key keyCode);
     void Update();
     void Draw();
-
+    void LoadSoundEffects();
 private:
     void togglePause() {
         _isPaused = !_isPaused;
+        pauseSound.play();
     }
 
+    void PlayTrackOnLoop();
     void reset();
     void updateDown();
     void drawNextPiece();
@@ -46,5 +49,23 @@ private:
     const unsigned _initialSpeed;
 
     sf::Clock _clock;
-};
 
+private:
+    sf::SoundBuffer dropSoundBuffer;
+    sf::Sound dropSound;
+
+    sf::SoundBuffer pauseSoundBuffer;
+    sf::Sound pauseSound;
+
+    sf::SoundBuffer rotateSoundBuffer;
+    sf::Sound rotateSound;
+
+    sf::SoundBuffer trackSoundBuffer;
+    sf::Sound trackSound;
+
+    sf::SoundBuffer lineCleanSoundBuffer;
+    sf::Sound lineCleanSound;
+
+    sf::SoundBuffer gameOverSoundBuffer;
+    sf::Sound gameOverSound;
+};

@@ -1,35 +1,38 @@
 #include "board.h"
 #include <iostream>
 
+//Creates the board
 Board::Board(int width, int height) : _width(width), _height(height) {
-    // Allocate memory for the 2D array
+    
     _grid = new int*[_height]{};
     for (int i = 0; i < _height; ++i) {
         _grid[i] = new int[_width]{};
     }
-
+    
     _cellShape.setSize(sf::Vector2f(30.f, 30.f));
     _cellShape.setOutlineThickness(1.f);
     _cellShape.setOutlineColor(sf::Color::White);
 }
 
 /**
- * @brief Sets the current piece on the board.
+ * @brief Sets the current Tetris piece on the board.
  *
  * This function places the given Tetris piece on the board at its initial position.
- * It checks if the destination cells on the board are empty; if not, the function returns false,
- * indicating that the game should end.
+ * It calculates the initial position based on the width of the board and the size of the Tetris piece.
+ * If the destination cells on the board are not empty, the function returns false, indicating a collision.
  *
  * @param currentPiece Pointer to the Tetris piece to be placed on the board.
- * @return True if the piece is successfully placed on the board, false otherwise.
+ * @return True if the piece is successfully placed on the board, false if there is a collision.
  */
 bool Board::SetCurrentPiece(Piece *currentPiece){
-    //initial position
+    // Calculate the initial position for the Tetris piece
     _currentPiecePosX = (_width - currentPiece->getNumColumns()) / 2;
     _currentPiecePosY = 0;
 
+    // Set the current Tetris piece
     _currentPiece = currentPiece;
 
+    // Check for collisions with existing filled cells on the board
     for(int row = 0; row < _currentPiece->getNumRows(); row++){
         for(int col = 0; col < _currentPiece->getNumColumns(); col++){
             // Check if the current cell on the board is not empty.
@@ -40,8 +43,11 @@ bool Board::SetCurrentPiece(Piece *currentPiece){
         }
     }
 
+    // The Tetris piece is successfully placed on the board.
     return true;
 }
+
+
 Board::~Board() {
     // Free the allocated memory for the 2D array
     for (int i = 0; i < _height; ++i) {
@@ -50,43 +56,57 @@ Board::~Board() {
     delete[] _grid;
 }
 
+
 void Board::MovePieceRight() {
-    if (_currentPiece == nullptr){
+    // Check if there is a current Tetris piece
+    if (_currentPiece == nullptr) {
         return;
     }
-    
+
+    // Calculate the new X-coordinate for the piece
     int newX = _currentPiecePosX + 1;
 
-    if(IsValidMove(newX, _currentPiecePosY)){
-        _currentPiecePosX = newX;
-    }
-}
-
-void Board::MovePieceLeft() {
-    if (_currentPiece == nullptr) { 
-        return;
-    }
-    
-    int newX = _currentPiecePosX - 1;
-    
+    // Check if the move to the right is valid
     if (IsValidMove(newX, _currentPiecePosY)) {
         _currentPiecePosX = newX;
     }
 }
 
+
+void Board::MovePieceLeft() {
+    // Check if there is a current Tetris piece
+    if (_currentPiece == nullptr) {
+        return;
+    }
+
+    // Calculate the new X-coordinate for the piece
+    int newX = _currentPiecePosX - 1;
+
+    // Check if the move to the left is valid
+    if (IsValidMove(newX, _currentPiecePosY)) {
+        _currentPiecePosX = newX;
+    }
+}
+
+
 void Board::ClearRow(int rowIndex) {
-    // Shift rows above the cleared row down
+    // Save a pointer to the row that will be cleared
     int *tempRow = _grid[rowIndex];
+
+    // Shift rows above the cleared row down
     for (int i = rowIndex; i > 0; --i) {
         _grid[i] = _grid[i - 1];
     }
 
-    //clear the top tow
+    // Clear the top row
     _grid[0] = tempRow;
+
+    // Clear all cells in the top row
     for (int j = 0; j < _width; ++j) {
         _grid[0][j] = 0;
     }
 }
+
 
 void Board::Clear() {
     for (unsigned row = 0; row < _height; ++row) {
@@ -100,28 +120,34 @@ void Board::Clear() {
 
 
 /**
- * @brief Moves the current piece down and handles locking and row clearing.
+ * @brief Moves the current Tetris piece down and handles locking and row clearing.
  *
- * Moves the current piece down on the game board. If the move is not valid, the piece is locked
- * in place, and any full rows are cleared.
+ * This function moves the current Tetris piece down on the game board. If the move is valid,
+ * the piece's vertical position is updated, and the function returns an empty pair.
+ * If the move is not valid, the piece is locked in place, and any full rows are cleared.
  *
  * @return A pair indicating whether the piece is locked and the number of cleared full rows.
  *         If no piece is present, an empty pair is returned.
  */
 std::pair<bool, int> Board::MovePieceDown() {
+    // Check if there is a current Tetris piece
     if (_currentPiece == nullptr) { 
         return {};
     }
  
+    // Calculate the new vertical position
     int newY = _currentPiecePosY + 1;
     
+    // Check if the move is valid
     if (IsValidMove(_currentPiecePosX, newY)) {
         _currentPiecePosY = newY;
         return {};
     }
     
+    // Lock the current piece in place
     LockCurrentPiece();
 
+    // Clear full rows and count the number of cleared rows
     int fullRowIndex = getFullRow();
     unsigned clearedRows = 0;
 
@@ -131,9 +157,11 @@ std::pair<bool, int> Board::MovePieceDown() {
         fullRowIndex = getFullRow();
     }
 
+    // Return a pair indicating the piece is locked and the number of cleared rows
     return {true, clearedRows};
 }
 
+// Locks the current Tetris piece in place on the game board.
 void Board::LockCurrentPiece(){
     int pieceRows = _currentPiece->getNumRows();
     int pieceCols = _currentPiece->getNumColumns();
@@ -221,7 +249,7 @@ void Board::draw(sf::RenderWindow& window) {
                 _cellShape.setFillColor(sf::Color::Black);
             }
 
-            // Hücre pozisyonunu ayarla ve çiz
+            // Set cell position and draw
             _cellShape.setPosition(j * 30.f, i * 30.f);
             window.draw(_cellShape);
         }

@@ -69,7 +69,6 @@ int main() {
                 tetrisGame.HandleKeyPress(event.key.code);
             }
         }
-
         tetrisGame.Update();
         tetrisGame.Draw();
         window.display();

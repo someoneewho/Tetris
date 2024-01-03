@@ -8,7 +8,49 @@ Game::Game(unsigned boardWidth, unsigned boardHeight, sf::RenderWindow& window, 
     : _window{window}, _tetrisBoard(boardWidth, boardHeight), _userName{userName}
     , _initialLevel{level}, _initialSpeed{speed}
 {
+    LoadSoundEffects();
+    PlayTrackOnLoop();
     reset();
+}
+
+void Game::LoadSoundEffects() {
+
+    if (!dropSoundBuffer.loadFromFile("drop.wav")) {
+        std::cerr << "Failed to load drop sound effect" << std::endl;
+    }
+
+    dropSound.setBuffer(dropSoundBuffer);
+
+    if (!pauseSoundBuffer.loadFromFile("pause.wav")) {
+        std::cerr << "Failed to load pause sound effect" << std::endl;
+    }
+    pauseSound.setBuffer(pauseSoundBuffer);
+
+    if (!rotateSoundBuffer.loadFromFile("rotate.wav")) {
+        std::cerr << "Failed to load drop sound effect" << std::endl;
+    }
+    rotateSound.setBuffer(rotateSoundBuffer);
+
+    if (!trackSoundBuffer.loadFromFile("track.wav")) {
+        std::cerr << "Failed to load pause sound effect" << std::endl;
+    }
+    trackSound.setBuffer(trackSoundBuffer);
+
+    if (!lineCleanSoundBuffer.loadFromFile("line_clean.wav")) {
+        std::cerr << "Failed to load drop sound effect" << std::endl;
+    }
+    lineCleanSound.setBuffer(lineCleanSoundBuffer);
+
+    if (!gameOverSoundBuffer.loadFromFile("gameOver.wav")) {
+        std::cerr << "Failed to load drop sound effect" << std::endl;
+    }
+    gameOverSound.setBuffer(gameOverSoundBuffer);
+
+}
+
+void Game::PlayTrackOnLoop() {
+    trackSound.setLoop(true);
+    trackSound.play();
 }
 
 void Game::HandleKeyPress(sf::Keyboard::Key keyCode) {
@@ -28,13 +70,16 @@ void Game::HandleKeyPress(sf::Keyboard::Key keyCode) {
         case sf::Keyboard::E:
             if (isGameRunning())
                 _tetrisBoard.RotatePieceCW();
+                rotateSound.play();
             break;
         case sf::Keyboard::Q:
             if (isGameRunning())
                 _tetrisBoard.RotatePieceCCW();
+                rotateSound.play();
             break;
         case sf::Keyboard::R:
             if (_isGameOver) {
+                trackSound.play();
                 reset();
             }
             break;
@@ -73,7 +118,7 @@ void Game::updateDown() {
         if (status == false) {
             _isGameOver = true;
         }
-        
+        dropSound.play();
     }
 }
 
@@ -197,6 +242,7 @@ void Game::displayGameInfo() {
 
     if (_isGameOver)
     {
+        trackSound.stop();
         sf::Text gameOverText;
         gameOverText.setFont(font);
         gameOverText.setCharacterSize(24);
@@ -207,8 +253,6 @@ void Game::displayGameInfo() {
     }
     
 }
-
-
 
 void Game::Draw() {
     _window.clear();

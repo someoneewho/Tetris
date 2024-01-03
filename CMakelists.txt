@@ -14,3 +14,7 @@ add_executable(tetris
 
 target_include_directories(tetris PRIVATE ${SFML_INCLUDE_DIRS})
 target_link_libraries(tetris PRIVATE sfml-graphics sfml-window)
+
+if(SFML_FOUND)
+    target_link_libraries(tetris PRIVATE sfml-audio)
+endif()
